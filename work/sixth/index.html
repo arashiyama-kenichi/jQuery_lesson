@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,6 +10,7 @@
   <link rel="stylesheet" href="./css/style.css">
   <title>Document</title>
 </head>
+
 <body>
   <div class="wrapper" id="wrapper">
     <button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>
@@ -16,6 +18,89 @@
   <script src="../../common/js/jquery.js"></script>
   <script>
     // 回答はここに書いてね
+    $(document).ready(function () {
+      let initialHtml = `<button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>
+      `;
+      function resetGame() {
+        $('#wrapper').html(initialHtml);
+      }
+
+      // ポケモンを探す機能
+      function handlePokemonSearch() {
+        let randomPokemonId = Math.floor(Math.random() * 151) + 1;
+        $.ajax({
+          url: `https://pokeapi.co/api/v2/pokemon/${randomPokemonId}`,
+          method: 'GET'
+        }).done(function (res) {
+          let pokemonName = res.species.name;
+          let pokemonImgSrc = res.sprites.front_default;
+
+          let encountHtml = `
+          <p class="name">${pokemonName}</p>
+          <div>
+            <img class="img" src="${pokemonImgSrc}" alt="${pokemonName}">
+          </div>
+          <div>
+            <button class="btn" id="catch">捕まえる</button>
+            <button class="btn" data-js="reset">逃げる</button>
+          </div>
+          `;
+          $('#wrapper').html(encountHtml);
+
+          $('#catch').on('click', () => handleCatchAttempt(pokemonName));
+          $('[data-js="reset"]').on('click', resetGame);
+        }).fail(function (err) {
+          console.error('データの取得に失敗しました:', err);
+          alert('ポケモンのデータを取得できませんでした。');
+          resetGame();
+        });
+      }
+
+      // 捕まえるか逃げる機能
+      function handleCatchAttempt(pokemonName) {
+        if (Math.random() < 0.5) {
+          $.ajax({
+            url: 'https://pokeapi.co/api/v2/item/4',
+            method: 'GET'
+          }).done(function (itemRes) {
+            let pokeBallImgSrc = itemRes.sprites.default;
+
+            // ゲット
+            let doneHtml = `
+                  <p class="name">ゲットしました</p>
+                  <div>
+                    <img class="img" src="${pokeBallImgSrc}" alt="">
+                  </div>
+                  <button class="btn" data-js="reset">戻る</button>
+                `;
+            $('#wrapper').html(doneHtml);
+            $('[date-jp="reset"]').on('click', resetGame);
+          }).fail(function (err) {
+            console.error('データの取得に失敗しました:', err);
+            alert('アイテムのデータを取得できませんでした。');
+            $('#wrapper').html(`
+              <p class="name">ゲットしました</p>
+              <div>
+                <img class="img" src="" alt="">
+              </div>
+              <button class="btn" data-js="reset">戻る</button>
+            `);
+            $('[data-js="reset"]').on('click', resetGame);
+          });
+        } else {
+
+          // ゲット失敗
+          let failHtml = `
+                  <p class="text">逃げられてしまった...</p>
+                  <button class="btn mt" data-js="reset">戻る</button>
+                `;
+          $('#wrapper').html(failHtml);
+        }
+      }
+      $('#wrapper').on('click', '#pokemon_search', handlePokemonSearch);
+      $('#wrapper').on('click', '[data-js="reset"]', resetGame);
+    });
   </script>
 </body>
+
 </html>
