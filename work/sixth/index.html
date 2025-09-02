@@ -36,7 +36,7 @@
           let speciesUrl = res.species.url;
 
           $.ajax({
-            url: speciesUrl,
+            url: res.species.url,
             method: 'GET'
           }).done(function (speciesRes) {
             // 日本語名を見つける
