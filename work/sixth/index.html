@@ -32,27 +32,36 @@
           url: `https://pokeapi.co/api/v2/pokemon/${randomPokemonId}`,
           method: 'GET'
         }).done(function (res) {
-          let pokemonName = res.species.name;
           let pokemonImgSrc = res.sprites.front_default;
+          let speciesUrl = res.species.url;
 
-          let encountHtml = `
-          <p class="name">${pokemonName}</p>
-          <div>
-            <img class="img" src="${pokemonImgSrc}" alt="${pokemonName}">
-          </div>
-          <div>
-            <button class="btn" id="catch">捕まえる</button>
-            <button class="btn" data-js="reset">逃げる</button>
-          </div>
-          `;
-          $('#wrapper').html(encountHtml);
+          $.ajax({
+            url: speciesUrl,
+            method: 'GET'
+          }).done(function (speciesRes) {
+            // 日本語名を見つける
+            let japaneseNameObj = speciesRes.names.find(name => name.language.name === 'ja');
+            let pokemonName = japaneseNameObj ? japaneseNameObj.name : res.species.name;
 
-          $('#catch').on('click', () => handleCatchAttempt(pokemonName));
-          $('[data-js="reset"]').on('click', resetGame);
-        }).fail(function (err) {
-          console.error('データの取得に失敗しました:', err);
-          alert('ポケモンのデータを取得できませんでした。');
-          resetGame();
+            let encountHtml = `
+            <p class="name">${pokemonName}</p>
+            <div>
+              <img class="img" src="${pokemonImgSrc}" alt="${pokemonName}">
+              </div>
+              <div>
+                <button class="btn" id="catch">捕まえる</button>
+                <button class="btn" data-js="reset">逃げる</button>
+                </div>
+                `;
+            $('#wrapper').html(encountHtml);
+
+            $('#catch').on('click', () => handleCatchAttempt(pokemonName));
+            $('[data-js="reset"]').on('click', resetGame);
+          }).fail(function (err) {
+            console.error('データの取得に失敗しました:', err);
+            alert('ポケモンのデータを取得できませんでした。');
+            resetGame();
+          });
         });
       }
 
