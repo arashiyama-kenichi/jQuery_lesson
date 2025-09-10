@@ -19,9 +19,15 @@
   <script>
     // 回答はここに書いてね
     $(document).ready(function () {
-      let initialHtml = `<button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>
-      `;
+      $('#wrapper').on('click', '#pokemon_search', handlePokemonSearch);
+      $('#wrapper').on('click', '#catch', handleCatchAttempt);
+      $('#wrapper').on('click', '[data-js="reset"]', resetGame);
+
+      // もどる
       function resetGame() {
+        let initialHtml = `
+          <button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>
+        `;
         $('#wrapper').html(initialHtml);
       }
 
@@ -43,35 +49,30 @@
             let japaneseNameObj = speciesRes.names.find(name => name.language.name === 'ja');
             let pokemonName = japaneseNameObj ? japaneseNameObj.name : res.species.name;
 
-            function showPokemon(pokemonName, pokeBallImgSrc) {
-              let encountHtml = `
-              <p class="name">${pokemonName}</p>
-              <div>
-                <img class="img" src="${pokemonImgSrc}" alt="${pokemonName}">
+            let encountHtml = `
+            <p class="name">${pokemonName}</p>
+            <div>
+              <img class="img" src="${pokemonImgSrc}" alt="${pokemonName}">
               </div>
               <div>
                 <button class="btn" id="catch">捕まえる</button>
                 <button class="btn" data-js="reset">逃げる</button>
                 </div>
                 `;
-              $('#wrapper').html(encountHtml);
+            $('#wrapper').html(encountHtml);
 
-              $('#catch').on('click', () => handleCatchAttempt(pokemonName));
-              $('[data-js="reset"]').on('click', resetGame);
-            };
-
-            showPokemon(pokemonName, pokemonImgSrc);
+            // $('#catch').on('click', () => handleCatchAttempt(pokemonName));
+            // $('[data-js="reset"]').on('click', resetGame);
           }).fail(function (err) {
             console.error('データの取得に失敗しました:', err);
             alert('ポケモンのデータを取得できませんでした。');
             resetGame();
           });
         });
-
       }
 
       // 捕まえるか逃げる機能
-      function handleCatchAttempt(pokemonName) {
+      function handleCatchAttempt() {
         let isGot = Math.random() < 0.5
 
         if (isGot) {
@@ -113,8 +114,7 @@
           $('#wrapper').html(failHtml);
         }
       }
-      $('#wrapper').on('click', '#pokemon_search', handlePokemonSearch);
-      $('#wrapper').on('click', '[data-js="reset"]', resetGame);
+
     });
   </script>
 </body>
