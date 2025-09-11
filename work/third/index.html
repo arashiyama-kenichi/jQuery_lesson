@@ -40,8 +40,8 @@
       $('.nav li').on('click', function () {
         let index = $(this).index();
 
-        $('.nav li').removeClass('active');
-        $(this).addClass('active');
+        // $('.nav li').removeClass('active');
+        // $(this).addClass('active');
         $('.contents li').addClass('is-hidden');
         $('.contents li').eq(index).removeClass('is-hidden');
       });
